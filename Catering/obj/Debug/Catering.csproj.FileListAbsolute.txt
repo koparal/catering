@@ -1,0 +1,7 @@
+c:\users\asus\source\repos\Catering\Catering\bin\Debug\Catering.exe.config
+c:\users\asus\source\repos\Catering\Catering\bin\Debug\Catering.exe
+c:\users\asus\source\repos\Catering\Catering\bin\Debug\Catering.pdb
+c:\users\asus\source\repos\Catering\Catering\obj\Debug\Catering.csprojAssemblyReference.cache
+c:\users\asus\source\repos\Catering\Catering\obj\Debug\Catering.csproj.CoreCompileInputs.cache
+c:\users\asus\source\repos\Catering\Catering\obj\Debug\Catering.exe
+c:\users\asus\source\repos\Catering\Catering\obj\Debug\Catering.pdb
