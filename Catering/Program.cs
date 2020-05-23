@@ -39,7 +39,7 @@ namespace Catering
                                         { 0, 0 ,0 },
                                         { 0, 0 ,0 },
                                         { 0, 0 ,0 },
-                                        { 0, 0 ,0 },
+                                        { 0, 0 ,0 }
                                     };
 
 
@@ -77,11 +77,14 @@ namespace Catering
             if(food_type == BOREK)
             {
                 edible_borek -= amount;
-            }else if(food_type == CAKE)
+            }
+
+            if (food_type == CAKE)
             {
                 edible_cake -= amount;
             }
-            else if (food_type == DRINK)
+
+            if (food_type == DRINK)
             {
                 edible_drink -= amount;
             }
@@ -91,15 +94,6 @@ namespace Catering
             {
                 had_eaten_guests.Add(guest_id);
             }
-
-            /*
-            for (int i = 0; i < had_eaten_guests.Count(); i++)
-            {
-                Console.WriteLine("List in {0}", had_eaten_guests[i]);
-            }
-            */
-
-            //Console.WriteLine("After Guest {0}", records.GetValue(guest_id, food_type));
 
         }
 
@@ -173,6 +167,25 @@ namespace Catering
             return false;
         }
 
+        public void checkIndexZeroGuest()
+        {
+            int rowLength = records.GetLength(0);
+            int colLength = records.GetLength(1);
+
+            for (int i = 0; i < rowLength; i++)
+            {
+                for (int j = 0; j < colLength; j++)
+                {
+
+                    if (records[i, j] == 0)
+                    {
+                        setGuestRecord(i, j, 1);
+                    }
+
+                }
+            }
+        }
+
         public Boolean checkGuestByIndex(int guest_id, int food_no, int qty)
         {
             int guestValue = Convert.ToInt32(records.GetValue(guest_id, food_no));
@@ -183,7 +196,7 @@ namespace Catering
                 return true;
             }
 
-            if (food_no == DRINK && guestValue <= 5 && qty <=5 && totalValue <= 5)
+            if (food_no == DRINK && guestValue <= 5 && qty <= 5 && totalValue <= 5)
             {
                 return true;
             }
@@ -198,26 +211,24 @@ namespace Catering
 
         public Boolean fillTrays(int tray_no, int food_no, int amount)
         {
-            //Console.WriteLine("Fill Trays Tray : {0} Food : {1}, Amount : {2}", tray_no, food_no, amount);
-
             int selected_food = 0;
 
-            if(food_no == BOREK)
+            if (food_no == BOREK)
             {
                 selected_food = borek_loop;
             }
-            else if(food_no == CAKE)
+
+            if (food_no == CAKE)
             {
                 selected_food = cake_loop;
             }
-            else if(food_no == DRINK)
+
+            if(food_no == DRINK)
             {
                 selected_food = drink_loop;
             }
 
-            
-
-            if(selected_food != 0)
+            if (selected_food != 0)
             {
                 //Console.WriteLine("Tray Update Start");
                 //displayTrays();
@@ -225,38 +236,50 @@ namespace Catering
                 int oldVal = Convert.ToInt32(trays.GetValue(tray_no, food_no));
                 int addVal = 0;
 
-                if(amount == 1)
+                if (amount == 1)
                 {
                     addVal = 4;
-                    result = oldVal + 4;
-                        
+
+                    if (selected_food < addVal) {
+                        addVal = selected_food;
+                    } 
+
+                    result = oldVal + addVal;
+
                 }
-                else if(amount == 0)
+                else if (amount == 0)
                 {
                     addVal = 5;
-                    result = oldVal + 5;
+
+                    if (selected_food < addVal)
+                    {
+                        addVal = selected_food;
+                    }
+
+                    result = oldVal + addVal;
                 }
                 else
                 {
-                    result = 5;
+                    addVal = 0;
                 }
 
                 if (food_no == BOREK)
                 {
-                    borek_loop-=result;
+                    borek_loop -= addVal;
                 }
-                else if (food_no == CAKE)
+                if (food_no == CAKE)
                 {
-                     cake_loop-=result;
+                    cake_loop -= addVal;
                 }
-                else if(food_no == DRINK)
+                if (food_no == DRINK)
                 {
-                    drink_loop-=result;
+                    drink_loop -= addVal;
                 }
 
-                
                 trays.SetValue(result, tray_no, food_no);
-                Console.WriteLine("***** Tray Updated *****");
+
+                int display_tray = tray_no + 1;
+                ConsoleWriteLine("**** Tray [" + display_tray + "] Updated *** ", ConsoleColor.DarkYellow);
                 //displayTrays();
 
             }
@@ -292,17 +315,24 @@ namespace Catering
             int rowLength = records.GetLength(0);
             int colLength = records.GetLength(1);
 
-            Console.WriteLine("\nGuest Eaten Foods (First Column: Borek, Second: Cake : Third : Drink)\n");
+            int borekTotal = 0;
+            int cakeTotal = 0;
+            int drinkTotal = 0;
             for (int i = 0; i < rowLength; i++)
             {
                 int inc = i + 1;
                 Console.Write("Guest " + inc + " -> ");
                 for (int j = 0; j < colLength; j++)
                 {
+                    if(j == BOREK) borekTotal += records[i, j];
+                    if(j == CAKE) cakeTotal += records[i, j];
+                    if(j == DRINK) drinkTotal += records[i, j];
+
                     Console.Write(string.Format("{0} ", records[i, j]));
                 }
                 Console.Write(Environment.NewLine + Environment.NewLine);
             }
+            //Console.WriteLine("Borek : {0} Cake : {1} Drink : {2}",borekTotal,cakeTotal,drinkTotal);
         }
 
         public int findFoodByName(string name)
@@ -324,17 +354,27 @@ namespace Catering
            
         }
 
-        public Boolean MinEatingFood(int guest_id, int food_type, int qty)
+        public string findFoodNameById(int food)
         {
-            int yemegen_sayisi = 10 - had_eaten_guests.Count();
-            int kalacak_yiyecek = edible_borek - qty;
-            /*
-            if (edible_borek >= yemegen_sayisi  && kalacak_yiyecek <= yemegen_sayisi)
-            {
-                return true;
-            }
-            */
 
+            if (food == 0)
+            {
+                return "Borek";
+            }
+
+            else if (food == 1)
+            {
+                return "Cake";
+            }
+            else
+            {
+                return "Drink";
+            }
+
+        }
+
+        public Boolean minEatingFood(int guest_id, int food_type, int qty)
+        {
             List<int> hicAlmayanlarBorek = new List<int>();
             List<int> hicAlmayanlarCake = new List<int>();
             List<int> hicAlmayanlarDrink = new List<int>();
@@ -349,6 +389,7 @@ namespace Catering
                 {
                     if (j == food_type && records[i, j] == 0)
                     {
+
                         if (food_type == BOREK)
                         {
                             if (!hicAlmayanlarBorek.Contains(i))
@@ -356,6 +397,7 @@ namespace Catering
                                 hicAlmayanlarBorek.Add(i);
                             }
                         }
+
 
                         if (food_type == CAKE)
                         {
@@ -366,13 +408,7 @@ namespace Catering
                         }
 
 
-                        if (food_type == DRINK)
-                        {
-                            if (!hicAlmayanlarDrink.Contains(i))
-                            {
-                                hicAlmayanlarDrink.Add(i);
-                            }
-                        }
+                       
 
                     }
                 }
@@ -380,40 +416,83 @@ namespace Catering
 
             if (food_type == BOREK)
             {
+                int kalacakBorekQty = edible_borek - qty;
                 int hicAlmayanlarinSayisiBorek = hicAlmayanlarBorek.Count();
-                Console.WriteLine("Borek almayan {0} kalan börek {1}", hicAlmayanlarinSayisiBorek, edible_borek);
-                if (hicAlmayanlarinSayisiBorek <= edible_borek)
+
+                if (hicAlmayanlarBorek.Contains(guest_id) && hicAlmayanlarinSayisiBorek <= edible_borek)
                 {
-                    return true;
+                    if (hicAlmayanlarinSayisiBorek-1 <= kalacakBorekQty)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (hicAlmayanlarinSayisiBorek <= edible_borek && hicAlmayanlarinSayisiBorek <= kalacakBorekQty)
+                    {
+                        return true;
+                    }
                 }
             }
 
 
             if (food_type == CAKE)
             {
+                int kalacakCakeQty = edible_cake - qty;
+
                 int hicAlmayanlarinSayisiCake = hicAlmayanlarCake.Count();
-                Console.WriteLine("Cake almayan {0} kalan cake {1}", hicAlmayanlarinSayisiCake, edible_cake);
-                if (hicAlmayanlarinSayisiCake <= edible_cake)
+
+                if (hicAlmayanlarCake.Contains(guest_id) && hicAlmayanlarinSayisiCake <= edible_cake)
                 {
-                    return true;
+                    if (hicAlmayanlarinSayisiCake - 1 <= kalacakCakeQty)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (hicAlmayanlarinSayisiCake <= edible_cake && hicAlmayanlarinSayisiCake <= kalacakCakeQty)
+                    {
+                        return true;
+                    }
                 }
             }
 
 
             if (food_type == DRINK)
             {
+                int kalacakDrinkQty = edible_drink - qty;
                 int hicAlmayanlarinSayisiDrink = hicAlmayanlarDrink.Count();
+                //Console.WriteLine("Hiç Almayan drink {0} Kalan {1}", hicAlmayanlarinSayisiDrink, edible_drink);
 
-                Console.WriteLine("Drink almayan {0} kalan drink {1}", hicAlmayanlarDrink, edible_drink);
-                if (hicAlmayanlarinSayisiDrink <= edible_drink )
+                if (hicAlmayanlarDrink.Contains(guest_id) && hicAlmayanlarinSayisiDrink <= edible_drink)
                 {
-                    return true;
+                    if (hicAlmayanlarinSayisiDrink - 1 <= kalacakDrinkQty)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (hicAlmayanlarinSayisiDrink <= edible_drink && hicAlmayanlarinSayisiDrink <= kalacakDrinkQty)
+                    {
+                        return true;
+                    }
                 }
             }
 
 
+
             return false;
         }
+
+        public void ConsoleWriteLine(string message, ConsoleColor textColor)
+        {
+            Console.ForegroundColor = textColor;
+            Console.WriteLine("[" + DateTime.Now + "] " + message + " ");
+            Console.ResetColor();
+        }
+
 
     }
     class Program
@@ -424,111 +503,87 @@ namespace Catering
             Catering cat = new Catering();
             int guest_id,tray,food,qty;
             cat.displayTrays();
-            //cat.displayRecords();
-            int loopCounter = 0;
+
             while (true)
             {
 
                 if (cat.checkIndexZeroTray())
                 {
 
-               // Console.WriteLine("Loop {0}", loopCounter);
                 Random randomG = new Random();
                 int randomGuest = randomG.Next(0, 10);
-                //Console.WriteLine("Guest {0}", randomGuest);
 
-                //Console.WriteLine("Yemek yiyen sayısı {0}", cat.checkMinEatingFood(1));
-                cat.checkTraysEmpty();
+                //Console.Write("Which Guest(1-10) : ");
+                //guest_id = Convert.ToInt32(Console.ReadLine())-1;
+                guest_id = randomGuest;
 
-                Console.Write("Which Guest(1-10) : ");
-                guest_id = Convert.ToInt32(Console.ReadLine())-1;
-                //guest_id = randomGuest;
-
-                int fail_counter = 0;
                 while (true)
                 {
                     cat.checkTraysEmpty();
 
-                    Random randomT = new Random();
-                    int randomTray = randomT.Next(0, 3);
+                    int randomTray = randomG.Next(0, 3);
 
-                    Random randomF = new Random();
-                    int randomFood = randomF.Next(0, 3);
+                    int randomFood = randomG.Next(0,3);
 
-                    Random randomQ = new Random();
-                    int randomQty = randomQ.Next(1, 1);
+                    int randomQty = randomG.Next(1, 2);
 
-                    Console.Write("Which Tray (1-3) : ");
-                    tray = Convert.ToInt32(Console.ReadLine())-1;
-                    //tray = randomTray;
+                    //Console.Write("Which Tray (1-3) : ");
+                    //tray = Convert.ToInt32(Console.ReadLine())-1;
+                    tray = randomTray;
 
-                    Console.Write("Which Food (borek, cake, drink) : ");
-                    string foodName = Console.ReadLine();
-                    food = cat.findFoodByName(foodName);
-                    //food = randomFood;
+                    //Console.Write("Which Food (borek, cake, drink) : ");
+                    //string foodName = Console.ReadLine();
+                    //food = cat.findFoodByName(foodName);
+                    food = randomFood;
 
-                    Console.Write("How Many? :  ");
-                    qty = Convert.ToInt32(Console.ReadLine());
+                    //Console.Write("How Many? :  ");
+                    //qty = Convert.ToInt32(Console.ReadLine());
 
-                    //qty = randomQty;
+                    qty = randomQty;
+                    //Console.WriteLine("Guest {0} Tray {1} Food {2} QTY {3}", guest_id, tray, food, qty);
 
-                    
-                    if (cat.checkGuestByIndex(guest_id, food, qty))
+                    if (cat.minEatingFood(guest_id, food, qty))
                     {
-                        if (cat.checkTrayByIndex(tray, food, qty))
+                        if (cat.checkGuestByIndex(guest_id, food, qty))
                         {
-                            if (cat.MinEatingFood(guest_id, food, qty))
+                            if (cat.checkTrayByIndex(tray, food, qty))
                             {
-                            cat.setGuestRecord(guest_id, food, qty);
-                            cat.setTrayRecord(tray, food, qty);
-                            Console.WriteLine("Kalan Borek {0}, Cake {1}, Drink {2}", cat.edible_borek, cat.edible_cake, cat.edible_drink);
-                            break;
+                                cat.setGuestRecord(guest_id, food, qty);
+                                cat.setTrayRecord(tray, food, qty);
+                                cat.ConsoleWriteLine("Customer ["+guest_id+"] ate "+qty+" "+cat.findFoodNameById(food) + "", ConsoleColor.DarkGreen);
+                                break;
                             }
                             else
                             {
-                                //fail_counter++;
-                                //if (fail_counter > 5) break;
-                                Console.WriteLine("Tepsi de alabileceğiniz kadar miktar yok. Tekrar deneyiniz");
-                                continue;
+                             //Console.WriteLine("\n Tepsi de alabileceğiniz kadar miktar yok. Tekrar deneyiniz");
+                             break;
                             }
                         }
                         else
                         {
-                            //fail_counter++;
-                            //if (fail_counter > 5) break;
-                            Console.WriteLine("Tepsi de alabileceğiniz kadar miktar yok. Tekrar deneyiniz");
-                            continue;
+                            //Console.WriteLine("\n Bu müşterinin limiti dolmuştur. Tekrar deneyiniz");
+                            break;
                         }
                     }
                     else
                     {
-                        //fail_counter++;
-                        //if (fail_counter > 5) break;
-                        Console.WriteLine("Bu müşterinin limiti dolmuştur. Tekrar deneyiniz");
-                        continue;
+                        //Console.WriteLine("\n Min yiyecek limiti dışında kaldınız.");
+                        break;
                     }
-                   
-                  
-           
                 }
 
-                cat.checkTraysEmpty();
-
-                //Console.WriteLine("Guest : {0}, Food : {1},Tray : {2}  Qty : {3}", guest_id,food,tray, qty);
-
-                //cat.setGuestRecord(guest_id,food, qty);
-                loopCounter++;
-
-                //cat.displayRecords();
-                cat.displayTrays();
-                Console.WriteLine("--------------");
                 }
                 else
                 {
+                    cat.checkIndexZeroGuest();
                     break;
                 }
             }
-            Console.WriteLine("Tüm yiyecek ve içecekler bitmiştir..");
+
+            cat.displayRecords();
+            cat.displayTrays();
+
+            cat.ConsoleWriteLine("**** Tüm yiyecek ve içecekler bitmiştir.. *** ", ConsoleColor.DarkGreen);
             Console.ReadKey();
         }
     }
