@@ -16,11 +16,11 @@ namespace Catering
         public int edible_cake = 15;
         public int edible_drink = 30;
 
-        List<int> had_eaten_customers = new List<int>();
-
         public int borek_loop = 15;
         public int cake_loop = 0;
         public int drink_loop = 15;
+
+        List<int> had_eaten_customers = new List<int>();
 
         public int[,] trays = new int[3, 3] {
                                         { 5, 5 ,5 },
@@ -94,118 +94,6 @@ namespace Catering
                 had_eaten_customers.Add(customer_id);
             }
 
-        }
-
-        public Boolean checkTraysEmpty()
-        {
-            int rowLength = trays.GetLength(0);
-            int colLength = trays.GetLength(1);
-
-            for (int i = 0; i < rowLength; i++)
-            {
-                for (int j = 0; j < colLength; j++)
-                {
-                    // Empty check
-                    if (trays[i, j] == 0 || trays[i, j] == 1)
-                    {
-                        int amount = trays[i, j];
-                        //Console.WriteLine("Check i {0} j : {1} amount : {2}", i, j, amount);
-                        if(fillTrays(i, j, amount) == false )
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        public Boolean checkTrayByIndex(int tray_no, int food_no,int qty)
-        {
-            int rowLength = trays.GetLength(0);
-            int colLength = trays.GetLength(1);
-
-            for (int i = 0; i < rowLength; i++)
-            {
-                for (int j = 0; j < colLength; j++)
-                {
-                    if(i == tray_no && j == food_no)
-                    {
-                        if(trays[i, j] >= qty)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        public Boolean checkIndexZeroTray()
-        {
-            int counter = 0;
-            int rowLength = trays.GetLength(0);
-            int colLength = trays.GetLength(1);
-
-            for (int i = 0; i < rowLength; i++)
-            {
-                for (int j = 0; j < colLength; j++)
-                {
-                    
-                    if (trays[i, j] == 0)
-                    {
-                        counter++;
-                    }
-                   
-                }
-            }
-
-            if (counter < 9) return true;
-            
-            return false;
-        }
-
-        public void checkIndexZeroCustomer()
-        {
-            int rowLength = records.GetLength(0);
-            int colLength = records.GetLength(1);
-
-            for (int i = 0; i < rowLength; i++)
-            {
-                for (int j = 0; j < colLength; j++)
-                {
-
-                    if (records[i, j] == 0)
-                    {
-                        setCustomerRecord(i, j, 1);
-                    }
-
-                }
-            }
-        }
-
-        public Boolean checkCustomerByIndex(int customer_id, int food_no, int qty)
-        {
-            int guestValue = Convert.ToInt32(records.GetValue(customer_id, food_no));
-            int totalValue = guestValue + qty;
-            //Console.WriteLine("Üyenin limiti {0}", guestValue);
-            if (food_no == BOREK && guestValue <= 5 && qty<=5 && totalValue<=5)
-            {
-                return true;
-            }
-
-            if (food_no == DRINK && guestValue <= 5 && qty <= 5 && totalValue <= 5)
-            {
-                return true;
-            }
-
-            if (food_no == CAKE && guestValue <= 2 && qty <= 2 && totalValue <= 2)
-            {
-                return true;
-            }
-           
-            return false;
         }
 
         public Boolean fillTrays(int tray_no, int food_no, int amount)
@@ -291,96 +179,6 @@ namespace Catering
 
         }
 
-        public void displayTrays()
-        {
-            int rowLength = trays.GetLength(0);
-            int colLength = trays.GetLength(1);
-
-            Console.WriteLine();
-            ConsoleWriteLine("\n\n --- Trays ---", ConsoleColor.DarkCyan);
-            Console.WriteLine();
-            Console.WriteLine("         [Borek] [Cake] [Drink]");
-            for (int i = 0; i < rowLength; i++)
-            {
-                int inc = i + 1;
-                Console.Write("Tray " + inc + " -> ");
-                for (int j = 0; j < colLength; j++)
-                {
-                    Console.Write(string.Format(" [{0}]    ", trays[i, j]));
-                }
-                Console.Write(Environment.NewLine + Environment.NewLine);
-            }
-        }
-
-        public void displayRecords()
-        {
-            int rowLength = records.GetLength(0);
-            int colLength = records.GetLength(1);
-
-            int borekTotal = 0;
-            int cakeTotal = 0;
-            int drinkTotal = 0;
-
-            Console.WriteLine();
-            ConsoleWriteLine("\n\n --- The amount of food consumed by customers ---", ConsoleColor.DarkCyan);
-            Console.WriteLine();
-
-            Console.WriteLine("             [Borek] [Cake] [Drink]");
-            for (int i = 0; i < rowLength; i++)
-            {
-                int inc = i + 1;
-                Console.Write("Customer " + inc + " -> ");
-                for (int j = 0; j < colLength; j++)
-                {
-                    if(j == BOREK) borekTotal += records[i, j];
-                    if(j == CAKE) cakeTotal += records[i, j];
-                    if(j == DRINK) drinkTotal += records[i, j];
-
-                    Console.Write(string.Format(" [{0}]    ", records[i, j]));
-                }
-                Console.Write(Environment.NewLine + Environment.NewLine);
-            }
-            //Console.WriteLine("Borek : {0} Cake : {1} Drink : {2}",borekTotal,cakeTotal,drinkTotal);
-        }
-
-        public int findFoodByName(string name)
-        {
-
-            if(name == "borek")
-            {
-                return 0;
-            } 
-
-            else if(name == "cake")
-            {
-                return 1;
-            }
-            else
-            {
-                return 2;
-            }
-           
-        }
-
-        public string findFoodNameById(int food)
-        {
-
-            if (food == 0)
-            {
-                return "Borek";
-            }
-
-            else if (food == 1)
-            {
-                return "Cake";
-            }
-            else
-            {
-                return "Drink";
-            }
-
-        }
-
         public Boolean minEatingFood(int customer_id, int food_type, int qty)
         {
             List<int> neverTakeBorek = new List<int>();
@@ -433,7 +231,7 @@ namespace Catering
 
                 if (neverTakeBorek.Contains(customer_id) && neverTakeNumberBorek <= edible_borek)
                 {
-                    if (neverTakeNumberBorek-1 <= lastBorekQty)
+                    if (neverTakeNumberBorek - 1 <= lastBorekQty)
                     {
                         return true;
                     }
@@ -498,6 +296,170 @@ namespace Catering
             return false;
         }
 
+        public Boolean checkTraysEmpty()
+        {
+            int rowLength = trays.GetLength(0);
+            int colLength = trays.GetLength(1);
+
+            for (int i = 0; i < rowLength; i++)
+            {
+                for (int j = 0; j < colLength; j++)
+                {
+                    // Empty check
+                    if (trays[i, j] == 0 || trays[i, j] == 1)
+                    {
+                        int amount = trays[i, j];
+                        //Console.WriteLine("Check i {0} j : {1} amount : {2}", i, j, amount);
+                        if (fillTrays(i, j, amount) == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public Boolean checkTrayByIndex(int tray_no, int food_no, int qty)
+        {
+            int rowLength = trays.GetLength(0);
+            int colLength = trays.GetLength(1);
+
+            for (int i = 0; i < rowLength; i++)
+            {
+                for (int j = 0; j < colLength; j++)
+                {
+                    if (i == tray_no && j == food_no)
+                    {
+                        if (trays[i, j] >= qty)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public Boolean checkIndexZeroTray()
+        {
+            int counter = 0;
+            int rowLength = trays.GetLength(0);
+            int colLength = trays.GetLength(1);
+
+            for (int i = 0; i < rowLength; i++)
+            {
+                for (int j = 0; j < colLength; j++)
+                {
+
+                    if (trays[i, j] == 0)
+                    {
+                        counter++;
+                    }
+
+                }
+            }
+
+            if (counter < 9) return true;
+
+            return false;
+        }
+
+        public void checkIndexZeroCustomer()
+        {
+            int rowLength = records.GetLength(0);
+            int colLength = records.GetLength(1);
+
+            for (int i = 0; i < rowLength; i++)
+            {
+                for (int j = 0; j < colLength; j++)
+                {
+
+                    if (records[i, j] == 0)
+                    {
+                        setCustomerRecord(i, j, 1);
+                    }
+
+                }
+            }
+        }
+
+        public Boolean checkCustomerByIndex(int customer_id, int food_no, int qty)
+        {
+            int guestValue = Convert.ToInt32(records.GetValue(customer_id, food_no));
+            int totalValue = guestValue + qty;
+            //Console.WriteLine("Üyenin limiti {0}", guestValue);
+            if (food_no == BOREK && guestValue <= 5 && qty <= 5 && totalValue <= 5)
+            {
+                return true;
+            }
+
+            if (food_no == DRINK && guestValue <= 5 && qty <= 5 && totalValue <= 5)
+            {
+                return true;
+            }
+
+            if (food_no == CAKE && guestValue <= 2 && qty <= 2 && totalValue <= 2)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void displayTrays()
+        {
+            int rowLength = trays.GetLength(0);
+            int colLength = trays.GetLength(1);
+
+            Console.WriteLine();
+            ConsoleWriteLine("\n\n --- Trays ---", ConsoleColor.DarkCyan);
+            Console.WriteLine();
+            Console.WriteLine("         [Borek] [Cake] [Drink]");
+            for (int i = 0; i < rowLength; i++)
+            {
+                int inc = i + 1;
+                Console.Write("Tray " + inc + " -> ");
+                for (int j = 0; j < colLength; j++)
+                {
+                    Console.Write(string.Format(" [{0}]    ", trays[i, j]));
+                }
+                Console.Write(Environment.NewLine + Environment.NewLine);
+            }
+        }
+
+        public void displayRecords()
+        {
+            int rowLength = records.GetLength(0);
+            int colLength = records.GetLength(1);
+
+            int borekTotal = 0;
+            int cakeTotal = 0;
+            int drinkTotal = 0;
+
+            Console.WriteLine();
+            ConsoleWriteLine("\n\n --- The amount of food consumed by customers ---", ConsoleColor.DarkCyan);
+            Console.WriteLine();
+
+            Console.WriteLine("             [Borek] [Cake] [Drink]");
+            for (int i = 0; i < rowLength; i++)
+            {
+                int inc = i + 1;
+                Console.Write("Customer " + inc + " -> ");
+                for (int j = 0; j < colLength; j++)
+                {
+                    if(j == BOREK) borekTotal += records[i, j];
+                    if(j == CAKE) cakeTotal += records[i, j];
+                    if(j == DRINK) drinkTotal += records[i, j];
+
+                    Console.Write(string.Format(" [{0}]    ", records[i, j]));
+                }
+                Console.Write(Environment.NewLine + Environment.NewLine);
+            }
+            //Console.WriteLine("Borek : {0} Cake : {1} Drink : {2}",borekTotal,cakeTotal,drinkTotal);
+        }
+
         public void ConsoleWriteLine(string message, ConsoleColor textColor)
         {
             Console.ForegroundColor = textColor;
@@ -505,6 +467,43 @@ namespace Catering
             Console.ResetColor();
         }
 
+        public int findFoodByName(string name)
+        {
+
+            if (name == "borek")
+            {
+                return 0;
+            }
+
+            else if (name == "cake")
+            {
+                return 1;
+            }
+            else
+            {
+                return 2;
+            }
+
+        }
+
+        public string findFoodNameById(int food)
+        {
+
+            if (food == 0)
+            {
+                return "Borek";
+            }
+
+            else if (food == 1)
+            {
+                return "Cake";
+            }
+            else
+            {
+                return "Drink";
+            }
+
+        }
 
     }
     class Program
@@ -566,19 +565,19 @@ namespace Catering
                             }
                             else
                             {
-                             //Console.WriteLine("\n Tepsi de alabileceğiniz kadar miktar yok. Tekrar deneyiniz");
-                             break;
+                                //Console.WriteLine("\n There is not enough to buy a tray. Try again");
+                                break;
                             }
                         }
                         else
                         {
-                            //Console.WriteLine("\n Bu müşterinin limiti dolmuştur. Tekrar deneyiniz");
-                            break;
+                                //Console.WriteLine("\n This customer's limit is reached. Try again");
+                                break;
                         }
                     }
                     else
                     {
-                        //Console.WriteLine("\n Min yiyecek limiti dışında kaldınız.");
+                        //Console.WriteLine("\n You have exceeded the min food limit.");
                         break;
                     }
                 }
